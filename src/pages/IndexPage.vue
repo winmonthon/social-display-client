@@ -5,7 +5,7 @@
     <div class="">
       <section class="q-pa-lg">
         <div
-          @click="goToPath(menu.link)"
+          @click="goToPath(menu.page)"
           class="q-card bg-black q-mb-lg q-pa-lg text-center menu"
           v-for="menu of menus"
           :key="menu.title"
@@ -32,20 +32,22 @@ export default defineComponent({
         {
           title: 'แจกวาร์ปรัวๆ คืนนี้ฉันจะเป็นดาว',
           desc: 'เริ่มต้นเพียง 99 บาท',
-          link: '/shop',
+          page: 'ShopPage',
         },
         {
           title: 'แจกวาร์ปรัวๆ คืนนี้ฉันจะเป็นดาว22',
           desc: 'เริ่มต้นเพียง 99 บาท',
-          link: '/asdas',
+          page: 'asdas',
         },
       ],
     }
   },
 
   methods: {
-    goToPath(link: string) {
-      this.$router.push(link)
+    goToPath(page: string) {
+      this.$router.push({
+        name: page,
+      })
     },
   },
 })

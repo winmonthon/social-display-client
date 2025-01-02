@@ -2,11 +2,11 @@ import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',
+    path: '/:shopId',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: 'shop', component: () => import('pages/shop/shopPage.vue') },
+      { path: 'shop', component: () => import('pages/shop/shopPage.vue'), name: 'ShopPage' },
     ],
   },
 

@@ -66,3 +66,33 @@
 .w-full {
   width: 100%;
 }
+
+.text-14 {
+  font-size: 14px;
+}
+
+.text-24 {
+  font-size: 24px;
+}
+
+.text-20 {
+  font-size: 20px;
+}
+
+.w-secondary-btn {
+  background-color: #ffffff;
+  color: black;
+  border-radius: 6px;
+  font-size: 14px !important;
+  font-weight: 300;
+  height: 44px;
+}
+
+.w-primary-btn {
+  background-color: black;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px !important;
+  font-weight: 300;
+  height: 44px;
+}
