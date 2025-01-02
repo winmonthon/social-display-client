@@ -1,1 +1,68 @@
 // app global css in SCSS form
+
+.title-text {
+  color: #b1b1b1;
+  font-weight: 300;
+  font-size: 14px;
+}
+
+.detail-text {
+  font-size: 12px;
+  font-weight: 300;
+  color: #7b7b7b;
+}
+
+.detail-text-lg {
+  font-size: 14px;
+  font-weight: 300;
+  color: #7b7b7b;
+}
+
+.w-input {
+  background: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  width: 100%;
+}
+
+.w-input:focus {
+  outline: none;
+}
+
+.upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  border: 2px dashed #606060;
+  border-radius: 6px;
+  background-color: #303030; /* Dark background */
+  color: #b1b1b1;
+  cursor: pointer;
+  text-align: center;
+}
+
+.upload-container:hover {
+  cursor: pointer;
+}
+
+.upload-input {
+  display: none; /* Hide the actual file input */
+}
+
+.w-text-300 {
+  font-weight: 300;
+}
+
+.w-checkbox-text {
+  font-weight: 500;
+  font-size: 14px;
+  color: #69c9d0;
+}
+
+.w-full {
+  width: 100%;
+}

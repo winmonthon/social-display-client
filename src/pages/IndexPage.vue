@@ -1,55 +1,61 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page class="">
+    <MainHeader />
+
+    <div class="">
+      <section class="q-pa-lg">
+        <div
+          @click="goToPath(menu.link)"
+          class="q-card bg-black q-mb-lg q-pa-lg text-center menu"
+          v-for="menu of menus"
+          :key="menu.title"
+        >
+          <div>{{ menu.title }}</div>
+
+          <div>{{ menu.desc }}</div>
+        </div>
+      </section>
+    </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import type { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
+import { defineComponent } from 'vue'
+import MainHeader from '../components/header/MainHeader.vue'
 
 export default defineComponent({
   name: 'IndexPage',
-
-  components: {
-    ExampleComponent
+  components: { MainHeader },
+  data() {
+    return {
+      menus: [
+        {
+          title: 'แจกวาร์ปรัวๆ คืนนี้ฉันจะเป็นดาว',
+          desc: 'เริ่มต้นเพียง 99 บาท',
+          link: '/shop',
+        },
+        {
+          title: 'แจกวาร์ปรัวๆ คืนนี้ฉันจะเป็นดาว22',
+          desc: 'เริ่มต้นเพียง 99 บาท',
+          link: '/asdas',
+        },
+      ],
+    }
   },
 
-  setup () {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1'
-      },
-      {
-        id: 2,
-        content: 'ct2'
-      },
-      {
-        id: 3,
-        content: 'ct3'
-      },
-      {
-        id: 4,
-        content: 'ct4'
-      },
-      {
-        id: 5,
-        content: 'ct5'
-      }
-    ]);
-
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
-
-    return { todos, meta };
-  }
-});
+  methods: {
+    goToPath(link: string) {
+      this.$router.push(link)
+    },
+  },
+})
 </script>
+
+<style scoped>
+.menu {
+}
+
+.menu:hover {
+  cursor: pointer;
+}
+</style>
