@@ -1,7 +1,7 @@
 <template>
   <div class="header q-pa-md">
     <q-icon @click="back" name="arrow_back_ios" size="16px" />
-    <div class="text-md">{{ title || 'asd' }}</div>
+    <div class="text-md">{{ title || '' }}</div>
     <div></div>
   </div>
 </template>

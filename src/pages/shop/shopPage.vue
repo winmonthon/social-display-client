@@ -27,33 +27,18 @@
 
       <!-- display input -->
       <div class="q-card q-mt-sm">
-        <div class="title-text">ชื่อ {{ selectedChannel.toUpperCase() }} คนแซ่บ</div>
+        <div class="title-text">ชื่อ {{ form.channel.toUpperCase() }} คนแซ่บ</div>
 
         <input
           class="w-input q-mt-xs"
           type="text"
           id="name"
           v-model="form.displayText"
-          :placeholder="`กรอกชื่อ ${selectedChannel.toUpperCase()} คนแซ่บ`"
+          :placeholder="`กรอกชื่อ ${form.channel.toUpperCase()} คนแซ่บ`"
         />
       </div>
 
       <div class="detail-text q-mt-sm">กรอกชื่อโปรไฟล์คนแซ่บ ที่ต้องการแสดงบนหน้าจอ</div>
-
-      <!-- Upload -->
-      <div class="q-mt-lg">
-        <label for="file-upload" class="upload-container">
-          <div class="flex item-center">
-            <q-icon left name="upload_file" size="20px"></q-icon>
-            อัปโหลดรูปภาพ
-          </div>
-        </label>
-        <input type="file" id="file-upload" class="upload-input" />
-
-        <div class="detail-text text-center q-mt-sm">
-          รูปปังๆ ของตัวแม่ ตัวพ่อ ที่ทุกคนต้องมองจนตาทะลุ อยาก รีบกดติดตามแทบไม่ทัน เอาสิ๊!
-        </div>
-      </div>
 
       <!-- Capture -->
       <div class="q-card q-mt-md">
@@ -87,10 +72,11 @@
         <div class="detail-text-lg q-mt-sm">ธีมตกแต่งให้สวยงาม ดึงดูดความสนใจ</div>
 
         <q-input
+          readonly
+          @click="toTheamSelectPage"
           class="q-mt-xs"
           label="เลือกธีม"
           v-if="form.isChangeTheam"
-          disable
           dense
           dark
           outlined
@@ -98,11 +84,27 @@
         ></q-input>
       </div>
 
+      <!-- Upload -->
+      <div class="q-mt-lg">
+        <UploadComponent @fileUploaded="onFileUploaded($event)" />
+      </div>
+
       <!-- IMAGE -->
       <div class="bg-black q-pa-md q-mt-md">
-        <div class="flex justify-center">
+        <div class="flex justify-center" v-if="!form.base64Image">
           <div class="image-display justify-center flex items-center">ไม่พบรูปภาพ</div>
         </div>
+
+        <!-- IMAGE DISPLAY -->
+        <div v-if="form.base64Image" class="flex justify-center items-center">
+          <ImageFrame :imageUrl="form.base64Image" />
+        </div>
+
+        <!-- <div class="flex justify-center items-center" v-if="form.base64Image">
+          <div class="image-display flex items-center">
+            <q-img :src="form.base64Image" class="upload-img w-full" />
+          </div>
+        </div> -->
 
         <div class="flex q-gutter-md justify-center items-center q-mt-xs">
           <div>
@@ -117,12 +119,12 @@
       <!-- FOOTER -->
       <div class="q-mt-sm">
         <div class="q-gutter-y-sm">
-          <q-btn class="w-secondary-btn w-full">
+          <q-btn :disable="!form.base64Image" class="w-secondary-btn w-full" @click="toCropPage()">
             <q-icon left size="xs" name="crop" />
             <div>แก้ไขรูปภาพ</div>
           </q-btn>
 
-          <q-btn class="w-primary-btn w-full no">
+          <q-btn @click="createPost()" class="w-primary-btn w-full no">
             <div>ไปกันต่อ! 🍻</div>
           </q-btn>
         </div>
@@ -136,18 +138,38 @@ import { defineComponent } from 'vue'
 import HeaderDefault from 'src/components/header/header.vue'
 import captionList from 'src/assets/caption/captionList.json'
 
+import UploadComponent from 'src/components/upload/UploadComponent.vue'
+import { useFormStore } from 'src/stores/form-store'
+import ImageFrame from 'src/components/theamFrame/ImageFrame.vue'
+import UploadService from 'src/services/uploadServices'
+import { useRoute } from 'vue-router'
+import PostService from 'src/services/postService'
+
 export default defineComponent({
   name: 'ShopPage',
-  components: { HeaderDefault },
+  components: {
+    HeaderDefault,
+    UploadComponent,
+
+    ImageFrame,
+  },
+  setup() {
+    const formStore = useFormStore()
+
+    return { formStore }
+  },
   data() {
     return {
       captionList: captionList,
       form: {
-        displayText: null,
+        displayText: '',
         addCaption: false,
         caption: '',
         isChangeTheam: false,
         theamId: null,
+        base64Image: null as string | null,
+        originalBase64Image: null as string | null,
+        channel: 'ig',
       },
 
       channelList: [
@@ -177,13 +199,24 @@ export default defineComponent({
           slug: 'line',
         },
       ],
-      selectedChannel: 'ig',
     }
   },
-  computed: {},
+  computed: {
+    merchantId() {
+      return this.$route.params.shopId || ''
+    },
+  },
+  async mounted() {
+    await this.initData()
+  },
   methods: {
+    toCropPage() {
+      this.saveFormToStore()
+      this.$router.push({ name: 'CropPage' })
+    },
+
     getLogo() {
-      switch (this.selectedChannel) {
+      switch (this.form.channel) {
         case 'ig':
           return '/ig.svg'
 
@@ -204,14 +237,61 @@ export default defineComponent({
       }
     },
     selectChannel(slug: string) {
-      this.selectedChannel = slug
+      this.form.channel = slug
     },
     isSelected(slug: string) {
-      if (slug === this.selectedChannel) {
+      if (slug === this.form.channel) {
         return 'selected-channel'
       }
 
       return 'channel'
+    },
+
+    onFileUploaded(base64Image: string) {
+      this.form.base64Image = base64Image
+      this.formStore.setOriginalBase64Image(base64Image)
+    },
+
+    async initData() {
+      this.form = this.formStore.form
+    },
+
+    toTheamSelectPage() {
+      this.saveFormToStore()
+      this.$router.push({ name: 'TheamPage' })
+    },
+
+    saveFormToStore() {
+      this.formStore.setFormValue({ ...this.form })
+    },
+
+    async createPost() {
+      try {
+        const file = await UploadService.base64ToFile(this.formStore.form.base64Image)
+
+        const { path: imagePath } = await UploadService.uploadImg(file, this.merchantId)
+
+        // 2657edd3-b13e-4714-99ad-70e68e00a066 for test
+        const createdPost = await PostService.createPost({
+          imageUrl: imagePath,
+          socialName: this.form.displayText,
+          channel: this.form.channel,
+          theam: null,
+          orderNumber: null,
+          merchantId: '2657edd3-b13e-4714-99ad-70e68e00a066',
+          caption: this.form.caption,
+        })
+
+        this.$q.notify({
+          color: 'positive',
+          message: 'DONE',
+        })
+      } catch (error) {
+        this.$q.notify({
+          color: 'negative',
+          message: 'เกิดข้อผิดพลาดในการอัปโหลด',
+        })
+      }
     },
   },
 })
@@ -244,6 +324,12 @@ export default defineComponent({
   background-color: #606060;
   width: 250px;
   border-radius: 20px;
-  height: 260px;
+  height: 250px;
+}
+
+.upload-img {
+  width: 250px;
+  border-radius: 20px;
+  height: 250px;
 }
 </style>

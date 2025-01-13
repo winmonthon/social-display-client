@@ -35,9 +35,9 @@ export default defineComponent({
           page: 'ShopPage',
         },
         {
-          title: 'แจกวาร์ปรัวๆ คืนนี้ฉันจะเป็นดาว22',
+          title: 'กดโหวดหัวใจ',
           desc: 'เริ่มต้นเพียง 99 บาท',
-          page: 'asdas',
+          page: 'PostPage',
         },
       ],
     }
